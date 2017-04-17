@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const User = require('./usersModel');
-const UserDao = require('./userDao');
+const addUser = require('./addUser');
 const app = express();
 const rtAPIv1 = express.Router();
 
@@ -9,34 +9,34 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({"extended": true}));
 
 
-let userDao = new UserDao();
+let addUser = new AddUser();
 
 //REST
 
-rtAPIv1.get("/users/", function(req, res) {
-    let userList = userDao.getUserList();
+rtAPIv1.get("/users", function(req, res) {
+    let userList = addUser.getUserList();
     res.send(userList);
 });
 
-rtAPIv1.post("/users/", function(req, res) {
-    let user = userDao.createUser(new User(null, req.body.name, req.body.score));
+rtAPIv1.post("/users", function(req, res) {
+    let user = addUser.createUser(new User(null, req.body.name, req.body.score));
     res.send(user);
 });
 
 rtAPIv1.delete("/users/:id", function(req, res) {
-    let user = userDao.removeUser(new User(req.params.id, null, null));
+    let user = addUser.removeUser(new User(req.params.id, null, null));
     if (user.id == undefined || user.id == 0) {res.status(500).json({ error: 'Error!' });}
     res.send(user);
 });
 
 rtAPIv1.get("/users/:id", function(req, res) {
-    let user = userDao.getUser(new User(req.params.id, null, null));
+    let user = addUser.getUser(new User(req.params.id, null, null));
     if (user.id == undefined || user.id == 0) {res.status(500).json({ error: 'Error!' });}
     res.send(user);
 });
 
 rtAPIv1.put("/users/:id", function(req, res) {
-    let user = userDao.updateUser(new User(req.params.id, req.query.name, req.query.score));
+    let user = addUser.updateUser(new User(req.params.id, req.query.name, req.query.score));
     if (user.id == undefined || user.id == 0) {res.status(500).json({ error: 'Error!' });}
     res.send(user);
 });
@@ -51,27 +51,27 @@ app.post('/rpc', function(req, res) {
     var data = req.body; err = null, rpcMethod = new Object();
 
     rpcMethods.getById = (params, result) => {
-        let user = userDao.getUser(new User(params.id, null, null));
+        let user = addUser.getUser(new User(params.id, null, null));
         result.onSuccess(user);
     };
 
     rpcMethods.getList = (params, result) => {
-        let user = userDao.getUserList();
+        let user = addUser.getUserList();
         result.onSuccess(user);
     };
 
     rpcMethods.create = (params, result) => {
-        let user = userDao.createUser(new User(null, params.name, params.score));
+        let user = addUser.createUser(new User(null, params.name, params.score));
         result.onSuccess(user);
     };
 
     rpcMethods.update = (params, result) => {
-        let user = userDao.updateUser(new User(params.id, params.name, params.score));
+        let user = addUser.updateUser(new User(params.id, params.name, params.score));
         result.onSuccess(user);
     };
 
     rpcMethods.delete = (params, result) => {
-        let user = userDao.removeUser(new User(params.id, null, null));
+        let user = addUser.removeUser(new User(params.id, null, null));
         result.onSuccess(user);
     };
 
